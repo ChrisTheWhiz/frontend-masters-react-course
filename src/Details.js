@@ -13,6 +13,7 @@ class Details extends React.Component {
   state = { loading: true };
 
   componentDidMount() {
+    // throw new Error('lol');
     pet.animal(this.props.id).then(({ animal }) => {
       this.setState({
         name: animal.name,
@@ -35,7 +36,6 @@ class Details extends React.Component {
     const { animal, breed, location, description, name, media } = this.state;
 
     return (
-      <ErrorBoundary>
         <div className="details">
           <Carousel media={media} />
           <div>
@@ -44,9 +44,14 @@ class Details extends React.Component {
             <p>{description}</p>
           </div>
         </div>
-      </ErrorBoundary>
     );
   }
 }
 
-export default Details;
+export default function DetailsWithErrorBoundary(props) {
+  return (
+    <ErrorBoundary>
+      <Details {...props}/>
+    </ErrorBoundary>
+  )
+};
