@@ -1,15 +1,25 @@
 // your code  here
+
 import React from "react";
 import { render } from "react-dom";
-// import Pet from "./Pet";
+import { Link, Router } from "@reach/router";
+
 import SearchParams from "./SearchParams";
+import Details from "./Details";
 
 const App = () => {
   return (
-    <div>
-      <h1 id="something-import">Adopt me</h1>
-      <SearchParams />
-    </div>
+    <React.StrictMode>
+      <div>
+        <header>
+          <Link to="/">Adopt me</Link>
+        </header>
+        <Router>
+          <SearchParams path="/" />
+          <Details path="/details/:id" />
+        </Router>
+      </div>
+    </React.StrictMode>
   );
 };
 render(<App />, document.getElementById("root"));
