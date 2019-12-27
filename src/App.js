@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { render } from "react-dom";
+
 import { Link, Router } from "@reach/router";
 
 import SearchParams from "./SearchParams";
@@ -25,4 +25,5 @@ const App = () => {
     </React.StrictMode>
   );
 };
-render(<App />, document.getElementById("root"));
+// render(<App />, document.getElementById("root"));
+export default App;
