@@ -1,73 +1,93 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import pet, { ANIMALS } from "@frontendmasters/pet";
+import { connect } from "react-redux";
 import useDropdown from "./useDropdowns";
-import Results from './Results';
-import ThemeContext from "./ThemeContext";
+import Results from "./Results";
+import changeLocation from "./actionCreators/changeLocation";
+import changeTheme from "./actionCreators/changeTheme";
 
-const SearchParams = () => {
-  const [location, setLocation] = useState("Seattle, WA");
-  const [breeds, setBreeds] = useState([]);
+const SearchParams = (props) => {
+  const [breeds, updateBreeds] = useState([]);
   const [pets, setPets] = useState([]);
   const [animal, AnimalDropdown] = useDropdown("Animal", "dog", ANIMALS);
-  const [breed, BreedDropdown, setBreed] = useDropdown("Breed", "", breeds);
-  const [theme, setTheme] = useContext(ThemeContext);
+  const [breed, BreedDropdown, updateBreed] = useDropdown("Breed", "", breeds);
 
   async function requestPets() {
-    const {animals} = await pet.animals({
-      location,
+    const { animals } = await pet.animals({
+      location: props.location,
       breed,
       type: animal
     });
+
+    console.log("animals", animals);
 
     setPets(animals || []);
   }
 
   useEffect(() => {
-    setBreeds([]);
-    setBreed("");
-    pet.breeds(animal)
-      .then(({breeds: apiBreeds}) => {
-        const breedString = apiBreeds.map(({name}) => name);
-        setBreeds(breedString);
-      }, console.error)
+    updateBreeds([]);
+    updateBreed("");
 
-  }, [animal, setBreed]);
+    pet.breeds(animal).then(({ breeds }) => {
+      const breedStrings = breeds.map(({ name }) => name);
+      updateBreeds(breedStrings);
+    }, console.error);
+  }, [animal]);
 
   return (
     <div className="search-params">
-      <h1>{location}</h1>
-      <form onSubmit={(e) => {
-        e.preventDefault();
-        requestPets();
-      }}>
+      <form
+        onSubmit={e => {
+          e.preventDefault();
+          requestPets();
+        }}
+      >
         <label htmlFor="location">
           Location
           <input
-            type="text"
             id="location"
-            value={location}
+            value={props.location}
             placeholder="Location"
-            onChange={e => setLocation(e.target.value)}
+            onChange={e => props.setLocation(e.target.value)}
           />
         </label>
         <AnimalDropdown />
         <BreedDropdown />
-        <label htmlFor="theme">
-          <select id="theme"
-                  value={theme}
-                  onChange={ e => setTheme(e.target.value)}
-                  onBlur={ e => setTheme(e.target.value)}>
-            <option value="peru">peru</option>
-            <option value="darkblue">darkblue</option>
-            <option value="mediumorchid">mediumorchid</option>
-            <option value="chartreuse">chartreuse</option>
+        <label htmlFor="location">
+          Theme
+          <select
+            value={props.theme}
+            onChange={e => props.setTheme(e.target.value)}
+            onBlur={e => props.setTheme(e.target.value)}
+          >
+            <option value="peru">Peru</option>
+            <option value="darkblue">Dark Blue</option>
+            <option value="chartreuse">Chartreuse</option>
+            <option value="mediumorchid">Medium Orchid</option>
           </select>
         </label>
-        <button style={{backgroundColor: theme}}>Submit</button>
+        <button style={{ backgroundColor: props.theme }}>Submit</button>
       </form>
       <Results pets={pets} />
     </div>
   );
 };
 
-export default SearchParams;
+const mapStateToProps = ({ theme, location }) => ({
+  theme,
+  location
+});
+
+const mapDispatchToProps = dispatch => ({
+  setLocation(location) {
+    dispatch(changeLocation(location));
+  },
+  setTheme(theme) {
+    dispatch(changeTheme(theme));
+  }
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(SearchParams);
