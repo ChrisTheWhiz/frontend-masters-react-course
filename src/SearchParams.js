@@ -30,7 +30,6 @@ const SearchParams = () => {
         const breedString = apiBreeds.map(({name}) => name);
         setBreeds(breedString);
       }, console.error)
-
   }, [animal, setBreed]);
 
   return (
